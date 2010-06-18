@@ -1032,7 +1032,7 @@ if __name__ == '__main__':
         copy(__file__, issuesdir)
         copy(join(dirname(__file__), "gitshelve.py"), issuesdir)
         copy(join(dirname(__file__), "t_gitshelve.py"), issuesdir)
-        copy(join(dirname(__file__), "README"), issuesdir)
+        copy(join(dirname(__file__), "README.textile"), issuesdir)
         copy(join(dirname(__file__), "LICENSE"), issuesdir)
         sys.exit(0)
 
