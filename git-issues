@@ -157,6 +157,20 @@ class Issue:
         self.self_dirty  = True
         self.comments    = {}
 
+        fields = [ "author", "title", "summary", 
+                   "description", "reporters", "owners", "assigned",
+                   "carbons", "status", "resolution", "components",
+                   "version", "milestone", "severity", "priority",
+                   "tags", "modified" ]
+
+        for field in fields:
+
+            def method(self, value):
+                self.note_change(field, getattr(self, field), value)
+                setattr(self, field, value)
+
+            setattr(self, "set_" + field, method)
+
     def mark_dirty(self, self_dirty):
         self.dirty = True
         if self_dirty:
@@ -175,73 +189,9 @@ class Issue:
             data = [before, after]
         self.changes[field] = data
 
-    def set_author(self, author):
-        self.note_change('author', self.author, author)
-        self.author = author
-
-    def set_title(self, title):
-        self.note_change('title', self.title, title)
-        self.title = title
-
-    def set_summary(self, summary):
-        self.note_change('summary', self.summary, summary)
-        self.summary = summary
-
-    def set_description(self, description):
-        self.note_change('description', self.description, description)
-        self.description = description
-
-    def set_reporters(self, reporters):
-        self.note_change('reporters', self.reporters, reporters)
-        self.reporters = reporters
-
-    def set_owners(self, owners):
-        self.note_change('owners', self.owners, owners)
-        self.owners = owners
-
-    def set_assigned(self, assigned):
-        self.note_change('assigned', self.assigned, assigned)
-        self.assigned = assigned
-
-    def set_carbons(self, carbons):
-        self.note_change('carbons', self.carbons, carbons)
-        self.carbons = carbons
-
-    def set_status(self, status):
-        self.note_change('status', self.status, status)
-        self.status = status
-
-    def set_resolution(self, resolution):
-        self.note_change('resolution', self.resolution, resolution)
-        self.resolution = resolution
-
     def set_issue_type(self, issue_type):
         self.note_change('type', self.issue_type, issue_type)
         self.issue_type = issue_type
-
-    def set_components(self, components):
-        self.note_change('components', self.components, components)
-        self.components = components
-
-    def set_version(self, version):
-        self.note_change('version', self.version, version)
-        self.version = version
-
-    def set_milestone(self, milestone):
-        self.note_change('milestone', self.milestone, milestone)
-        self.milestone = milestone
-
-    def set_severity(self, severity):
-        self.note_change('severity', self.severity, severity)
-        self.severity = severity
-
-    def set_priority(self, priority):
-        self.note_change('priority', self.priority, priority)
-        self.priority = priority
-
-    def set_tags(self, tags):
-        self.note_change('tags', self.tags, tags)
-        self.tags = tags
 
     def __getstate__(self):
         odict = self.__dict__.copy() # copy the dict since we change it
@@ -600,81 +550,21 @@ class XmlIssueBuilder:
     def build(cls, issue, node, doc):
         issueNode = doc.createElement("issue")
 
-        created = doc.createElement("created")
-        XmlBuilder.build(issue.created, created, doc)
-        issueNode.appendChild(created)
+        subNodeNames = [ "created", "author", "title", "summary", 
+                         "description", "reporters", "owners", "assigned",
+                         "carbons", "status", "resolution", "components",
+                         "version", "milestone", "severity", "priority",
+                         "tags", "modified" ]
 
-        author = doc.createElement("author")
-        XmlBuilder.build(issue.author, author, doc)
-        issueNode.appendChild(author)
-
-        title = doc.createElement("title")
-        XmlBuilder.build(issue.title, title, doc)
-        issueNode.appendChild(title)
-
-        summary = doc.createElement("summary")
-        XmlBuilder.build(issue.summary, summary, doc)
-        issueNode.appendChild(summary)
-
-        description = doc.createElement("description")
-        XmlBuilder.build(issue.description, description, doc)
-        issueNode.appendChild(description)
-
-        reporters = doc.createElement("reporters")
-        XmlBuilder.build(issue.reporters, reporters, doc)
-        issueNode.appendChild(reporters)
-
-        owners = doc.createElement("owners")
-        XmlBuilder.build(issue.owners, owners, doc)
-        issueNode.appendChild(owners)
-
-        assigned = doc.createElement("assigned")
-        XmlBuilder.build(issue.assigned, assigned, doc)
-        issueNode.appendChild(assigned)
-
-        carbons = doc.createElement("carbons")
-        XmlBuilder.build(issue.carbons, carbons, doc)
-        issueNode.appendChild(carbons)
-
-        status = doc.createElement("status")
-        XmlBuilder.build(issue.status, status, doc)
-        issueNode.appendChild(status)
-
-        resolution = doc.createElement("resolution")
-        XmlBuilder.build(issue.resolution, resolution, doc)
-        issueNode.appendChild(resolution)
+        for name in subNodeNames:
+	    subnode = doc.createElement(name)
+	    subdata = getattr(issue, name)
+	    XmlBuilder.build(subdata, subnode, doc)
+	    node.appendChild(subnode)
 
         issue_type = doc.createElement("type")
         XmlBuilder.build(issue.issue_type, issue_type, doc)
         issueNode.appendChild(issue_type)
-
-        components = doc.createElement("components")
-        XmlBuilder.build(issue.components, components, doc)
-        issueNode.appendChild(components)
-
-        version = doc.createElement("version")
-        XmlBuilder.build(issue.version, version, doc)
-        issueNode.appendChild(version)
-
-        milestone = doc.createElement("milestone")
-        XmlBuilder.build(issue.milestone, milestone, doc)
-        issueNode.appendChild(milestone)
-
-        severity = doc.createElement("severity")
-        XmlBuilder.build(issue.severity, severity, doc)
-        issueNode.appendChild(severity)
-
-        priority = doc.createElement("priority")
-        XmlBuilder.build(issue.priority, priority, doc)
-        issueNode.appendChild(priority)
-
-        tags = doc.createElement("tags")
-        XmlBuilder.build(issue.tags, tags, doc)
-        issueNode.appendChild(tags)
-
-        modified = doc.createElement("modified")
-        XmlBuilder.build(issue.modified, modified, doc)
-        issueNode.appendChild(modified)
 
         node.appendChild(issueNode)
 
@@ -684,17 +574,14 @@ class XmlCommentBuilder:
     def build(cls, comment, node, doc):
         commentNode = doc.createElement("comment")
 
-        created = doc.createElement("created")
-        XmlBuilder.build(comment.created, created, doc)
-        commentNode.appendChild(created)
+        subNodeNames = [ "created", "author", "comment" ]
 
-        author = doc.createElement("author")
-        XmlBuilder.build(comment.author, author, doc)
-        commentNode.appendChild(author)
+        for name in subNodeNames:
+	    subnode = doc.createElement(name)
+	    subdata = getattr(comment, name)
+	    XmlBuilder.build(subdata, subnode, doc)
+	    commentNode.appendChild(subnode)
 
-        commentText = doc.createElement("comment")
-        XmlBuilder.build(comment.comment, commentText, doc)
-        commentNode.appendChild(commentText)
         node.appendChild(commentNode)
 
     build = classmethod(build)
@@ -728,45 +615,20 @@ class XmlIssueSetBuilder:
     def build(cls, issueSet, node, doc):
         set = doc.createElement("issue-set")
 
-        created = doc.createElement("created")
-        XmlBuilder.build(issueSet.created, created, doc)
-        set.appendChild(created)
+        subNodeNames = [ "created", "statuses", "resolutions", "components", 
+			 "versions", "milestones", "severities", "priorities",
+			 "modified" ]
 
-        statuses = doc.createElement("statuses")
-        XmlBuilder.build(issueSet.statuses, statuses, doc)
-        set.appendChild(statuses)
+        for name in subNodeNames:
+	    subnode = doc.createElement(name)
+	    subdata = getattr(issueSet, name)
+	    XmlBuilder.build(subdata, subnode, doc)
+	    node.appendChild(subnode)
 
-        resolutions = doc.createElement("resolutions")
-        XmlBuilder.build(issueSet.resolutions, resolutions, doc)
-        set.appendChild(resolutions)
-
+        # types is singled out because it changes names
         issue_types = doc.createElement("types")
         XmlBuilder.build(issueSet.issue_types, issue_types, doc)
         set.appendChild(issue_types)
-
-        components = doc.createElement("components")
-        XmlBuilder.build(issueSet.components, components, doc)
-        set.appendChild(components)
-
-        versions = doc.createElement("versions")
-        XmlBuilder.build(issueSet.versions, versions, doc)
-        set.appendChild(versions)
-
-        milestones = doc.createElement("milestones")
-        XmlBuilder.build(issueSet.milestones, milestones, doc)
-        set.appendChild(milestones)
-
-        severities = doc.createElement("severities")
-        XmlBuilder.build(issueSet.severities, severities, doc)
-        set.appendChild(severities)
-
-        priorities = doc.createElement("priorities")
-        XmlBuilder.build(issueSet.priorities, priorities, doc)
-        set.appendChild(priorities)
-
-        modified = doc.createElement("modified")
-        XmlBuilder.build(issueSet.modified, modified, doc)
-        set.appendChild(modified)
 
         node.appendChild(set)
 
