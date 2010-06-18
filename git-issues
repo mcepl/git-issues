@@ -735,31 +735,17 @@ def format_long_text(text, indent = 13):
 
     lines = text.split('\n')
 
-    buffer = StringIO()
-    first = True
-    for line in lines:
-        if not first:
-            buffer.write("\n%s" % (" " * indent))
-        else:
-            first = False
-        buffer.write(line)
+    delim = "\n" + " " * indent
+    return delim.join(lines)
 
-    return buffer.getvalue()
 
 def format_people_list(people, indent = 13):
     if not people:
         return "<no one yet>"
 
-    buffer = StringIO()
-    first = True
-    for person in people:
-        if not first:
-            buffer.write(",\n%s" % (" " * indent))
-        else:
-            first = False
-        buffer.write(person)
+    delim = ",\n" + " " * indent
+    return delim.join(people)
 
-    return buffer.getvalue()
 
 def terminal_width():
     """Return terminal width."""
