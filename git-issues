@@ -895,7 +895,7 @@ if __name__ == '__main__':
 
         index = 1
         filteredStati = options.filterStatus.split(":")
-        wantedTags = dict([(tag,1) for tag in options.filterTags.split(":") if tag])
+        wantedTags = set(options.filterTags.split(":"))
 
         for item in issueSet.shelf.iteritems():
             if "comment" in item[0]:
@@ -906,7 +906,7 @@ if __name__ == '__main__':
             if wantedTags and not issue.tags:
               continue
             if wantedTags:
-              matchingTags = [tag for tag in issue.tags.split(", ") if wantedTags.has_key(tag)]
+              matchingTags = [tag for tag in issue.tags.split(", ") if tag in wantedTags]
               if not matchingTags:
                 continue
             formatString = "%4d  %s  %-" + str(titleWidth+len("Title")-1) + "s %-6s %5s %6s %s"
