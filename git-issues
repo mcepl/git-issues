@@ -182,11 +182,8 @@ class Issue:
         assert False
 
     def note_change(self, field, before, after):
-        if self.changes.has_key(field):
-            data = self.changes[field]
-            data[1] = after
-        else:
-            data = [before, after]
+        data = self.changes.get(field, [ before, None ])
+        data[1] = after
         self.changes[field] = data
 
     def set_issue_type(self, issue_type):
