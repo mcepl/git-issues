@@ -554,10 +554,10 @@ class XmlIssueBuilder:
                          "tags", "modified" ]
 
         for name in subNodeNames:
-	    subnode = doc.createElement(name)
-	    subdata = getattr(issue, name)
-	    XmlBuilder.build(subdata, subnode, doc)
-	    node.appendChild(subnode)
+            subnode = doc.createElement(name)
+            subdata = getattr(issue, name)
+            XmlBuilder.build(subdata, subnode, doc)
+            node.appendChild(subnode)
 
         issue_type = doc.createElement("type")
         XmlBuilder.build(issue.issue_type, issue_type, doc)
@@ -574,10 +574,10 @@ class XmlCommentBuilder:
         subNodeNames = [ "created", "author", "comment" ]
 
         for name in subNodeNames:
-	    subnode = doc.createElement(name)
-	    subdata = getattr(comment, name)
-	    XmlBuilder.build(subdata, subnode, doc)
-	    commentNode.appendChild(subnode)
+            subnode = doc.createElement(name)
+            subdata = getattr(comment, name)
+            XmlBuilder.build(subdata, subnode, doc)
+            commentNode.appendChild(subnode)
 
         node.appendChild(commentNode)
 
@@ -613,14 +613,14 @@ class XmlIssueSetBuilder:
         set = doc.createElement("issue-set")
 
         subNodeNames = [ "created", "statuses", "resolutions", "components", 
-			 "versions", "milestones", "severities", "priorities",
-			 "modified" ]
+                         "versions", "milestones", "severities", "priorities",
+                         "modified" ]
 
         for name in subNodeNames:
-	    subnode = doc.createElement(name)
-	    subdata = getattr(issueSet, name)
-	    XmlBuilder.build(subdata, subnode, doc)
-	    node.appendChild(subnode)
+            subnode = doc.createElement(name)
+            subdata = getattr(issueSet, name)
+            XmlBuilder.build(subdata, subnode, doc)
+            node.appendChild(subnode)
 
         # types is singled out because it changes names
         issue_types = doc.createElement("types")
