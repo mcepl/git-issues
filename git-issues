@@ -305,11 +305,13 @@ class IssueSet:
 
     def comment_path(self, comment):
         name = comment.issue.get_name()
-        return "%s/%s/comment_%s_%s_%s.xml" % (name[:2],
-                                           name[2:],
-                                           comment.name,
-                                           datetime.now().isoformat(),
-                                           comment.comment)
+        # we don't need obsessively long filenames
+        return "%s/%s/comment_%s_%s_%s.xml" % \
+            (name[:2],
+             name[2:],
+             comment.name,
+             datetime.now().isoformat(),
+             comment.comment)
 
     def issue_path(self, issue):
         name = issue.get_name()
@@ -339,8 +341,8 @@ class IssueSet:
                 return x
             clean = lambda x: getCommentId(x)
             matching = [(clean(key), key) for key in self.shelf.iterkeys()
-                        if clean(key).startswith(idx_or_partial_hash) and \
-                                        not "issue.xml" in clean(key)]
+                        if clean(key).startswith(idx_or_partial_hash) and
+                        not "issue.xml" in clean(key)]
             if len(matching) == 0:
                 pass
             elif len(matching) == 1:
@@ -349,8 +351,9 @@ class IssueSet:
                 print ("Ambiguous hash matches:\n" +
                        '\t\n'.join(a[0] for a in matching))
         if not comment:
-            raise Exception("There is no issue matching the identifier '%s'.\n" %
-                            idx_or_partial_hash)
+            raise Exception(
+                "There is no issue matching the identifier '%s'.\n" %
+                idx_or_partial_hash)
         return comment
 
     def __getitem__(self, idx_or_partial_hash):
@@ -362,7 +365,7 @@ class IssueSet:
             clean = lambda x: x.replace('issue.xml', '').replace('/', '')
             matching = [(clean(key), key) for key in self.shelf.iterkeys()
                         if clean(key).startswith(idx_or_partial_hash) and
-                                not "comment" in clean(key)]
+                        not "comment" in clean(key)]
             if len(matching) == 0:
                 pass
             elif len(matching) == 1:
@@ -372,8 +375,9 @@ class IssueSet:
                        '\t\n'.join(a[0] for a in matching))
 
         if not issue:
-            raise Exception("There is no issue matching the identifier '%s'.\n" %
-                            idx_or_partial_hash)
+            raise Exception(
+                "There is no issue matching the identifier '%s'.\n" %
+                idx_or_partial_hash)
 
         return issue
 
@@ -386,9 +390,9 @@ class IssueSet:
 
     def load_state(self):
         """Given a newly created IssueSet object as a template, see if we can
-        restore the cached version of the data from disk, and then check whether
-        it's still valid.  This can _greatly_ speed up subsequent list and show
-        operations.
+        restore the cached version of the data from disk, and then check
+        whether it's still valid.  This can _greatly_ speed up subsequent list
+        and show operations.
 
         The reason why a newly created template exists is to abstract
         DVCS-specific behavior, such as the location of the cache file.
@@ -399,7 +403,8 @@ class IssueSet:
 
           if ... looking at issues list is required ...:
               issueSet = issueSet.load_state()
-              ... use the issue data ..."""
+              ... use the issue data ...
+        """
         cache_file = self.issues_cache_file()
         if os.path.isfile(cache_file):
             fd = open(cache_file, 'rb')
@@ -427,8 +432,9 @@ class IssueSet:
             return self
 
     def save_state(self):
-        """Write an IssueSet to disk in object form, for fast loading on the next
-        iteration.  This is only done if there are actual changes to write."""
+        """Write an IssueSet to disk in object form, for fast loading on the
+        next iteration.  This is only done if there are actual changes to
+        write."""
         if not self.dirty:
             return
 
@@ -496,7 +502,7 @@ class XmlListRipper:
 class XmlDateTimeRipper:
     def rip(cls, node):
         return datetime.strptime(node.childNodes[0].data[1:-1],
-                        iso_fmt)
+                                 iso_fmt)
 
     rip = classmethod(rip)
 
@@ -953,8 +959,8 @@ def terminal_width():
 
 ######################################################################
 
-parser = optparse.OptionParser(usage=\
-"""Usage: git-issues [options] <command> [command-options]
+parser = optparse.OptionParser(usage="""
+Usage: git-issues [options] <command> [command-options]
 
 Commands:
   init        Creates a copy of git-issues repository in .gitissues in the
@@ -965,7 +971,8 @@ Commands:
   change      Change options for the given ticket
   edit        edit options for the given ticket in text editor
   comment     Add a comment to the given ticket
-  close       Close the given ticket""")
+  close       Close the given ticket"""
+parser = optparse.OptionParser(usage=description)
 parser.add_option("-v", "--verbose",
                   action="store_true",
                   dest="verbose",
@@ -976,7 +983,8 @@ parser.add_option("--print-new-bugs",
                   action="store_true",
                   dest="printNewBugs",
                   default=False,
-                  help="prints out a formatted string with the bug summary and id. Usuful for in editor usage.")
+                  help="prints out a formatted string with the bug summary " +
+                  "and id. Usuful for in editor usage.")
 
 parser.add_option("--filter-status",
                   dest="filterStatus",
@@ -999,7 +1007,8 @@ parser.add_option("--status",
                   dest="status",
                   default=None,
                   metavar="STATUS",
-                  help="Set the status of the issue to STATUS when creating it.")
+                  help="Set the status of the issue to STATUS " +
+                  "when creating it.")
 
 (options, args) = parser.parse_args()
 
@@ -1020,7 +1029,7 @@ def inputFromEditor(originalText):
     if "VISUAL" in os.environ:
         defaultEditor = os.getenv("VISUAL")
     elif "EDITOR" in os.environ:
-        defualtEditor = os.getenv("EDITOR")
+        defaultEditor = os.getenv("EDITOR")
     editCommand = "%s %s" % (defaultEditor, tempFile)
     if os.system(editCommand) != 0:
         os.unlink(tempFile)
@@ -1063,10 +1072,14 @@ if __name__ == '__main__':
             sys.exit(1)
         os.makedirs(issuesdir)
         copy(__file__, issuesdir)
-        copy(os.path.join(os.path.dirname(__file__), "gitshelve.py"), issuesdir)
-        copy(os.path.join(os.path.dirname(__file__), "t_gitshelve.py"), issuesdir)
-        copy(os.path.join(os.path.dirname(__file__), "README"), issuesdir)
-        copy(os.path.join(os.path.dirname(__file__), "LICENSE"), issuesdir)
+        copy(os.path.join(os.path.dirname(__file__),
+                          "gitshelve.py"), issuesdir)
+        copy(os.path.join(os.path.dirname(__file__),
+                          "t_gitshelve.py"), issuesdir)
+        copy(os.path.join(os.path.dirname(__file__),
+                          "README"), issuesdir)
+        copy(os.path.join(os.path.dirname(__file__),
+                          "LICENSE"), issuesdir)
         sys.exit(0)
 
 ######################################################################
@@ -1080,7 +1093,8 @@ if __name__ == '__main__':
 
         index = 1
         filteredStati = options.filterStatus.split(":")
-        wantedTags = dict([(tag, 1) for tag in options.filterTags.split(":") if tag])
+        wantedTags = dict([(tag, 1) for tag in
+                           options.filterTags.split(":") if tag])
 
         for item in issueSet.shelf.iteritems():
             if "comment" in item[0]:
@@ -1092,10 +1106,11 @@ if __name__ == '__main__':
                 continue
             if wantedTags:
                 matchingTags = [tag for tag in issue.tags.split(", ")
-                    if tag in wantedTags]
+                                if tag in wantedTags]
                 if not matchingTags:
                     continue
-            formatString = "%4d  %s  %-" + unicode(titleWidth + len("Title") - 1) + \
+            formatString = "%4d  %s  %-" + \
+                unicode(titleWidth + len("Title") - 1) + \
                 "s %-6s %5s %6s %s"
             print formatString % \
                 (index, issue.name[:7], issue.title, issue.status,
@@ -1113,7 +1128,8 @@ if __name__ == '__main__':
         else:
             issue = issueSet[args[0]]
             comments = "\n       ".join(["Comment (%s): %s" % (comment[0:7],
-                                        issueSet.get_comment(comment[0:7]).comment)
+                                        issueSet.get_comment(
+                                            comment[0:7]).comment)
                                         for comment in issue.comments])
             if command == "show":
                 if issue.title:
@@ -1122,18 +1138,23 @@ if __name__ == '__main__':
                     print "        Summary:", format_long_text(issue.summary)
                     print
                 if issue.description:
-                    print "    Description:", format_long_text(issue.description)
+                    print "    Description:", format_long_text(
+                        issue.description)
                     print
                 if issue.author:
                     print "         Author:", issue.author
                 if issue.reporters:
-                    print "    Reporter(s):", format_people_list(issue.reporters)
+                    print "    Reporter(s):", format_people_list(
+                        issue.reporters)
                 if issue.owners:
-                    print "       Owner(s):", format_people_list(issue.owners)
+                    print "       Owner(s):", \
+                                    format_people_list(issue.owners)
                 if issue.assigned:
-                    print "       Assigned:", format_people_list(issue.assigned)
+                    print "       Assigned:", format_people_list(
+                        issue.assigned)
                 if issue.carbons:
-                    print "             Cc:", format_people_list(issue.carbons)
+                    print "             Cc:", \
+                                    format_people_list(issue.carbons)
 
                 if issue.issue_type:
                     print "           Type:", issue.issue_type
@@ -1216,7 +1237,8 @@ if __name__ == '__main__':
                 issue.set_status("TODO")
 
             if options.printNewBugs:
-                print "%s: %s (%s)" % (issue.status, issue.title, issue.name[0:7])
+                print "%s: %s (%s)" % (issue.status, issue.title,
+                                       issue.name[0:7])
     elif command == "comment":
         if len(args) == 0:
             print "Usage: %s comment <issue-id> <comment-title>" % sys.argv[0]
